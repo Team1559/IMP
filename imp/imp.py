@@ -14,7 +14,7 @@ def stereo():
         s.find()
 
 def peg():
-    p = pegFinder.PegFinder(3)
+    p = pegFinder.PegFinder()
     while 1:
         p.find()
 

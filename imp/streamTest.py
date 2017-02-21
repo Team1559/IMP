@@ -1,10 +1,16 @@
 import gst_streamer as gs
 import cv2
+#import time
 
-indexes =[2,-1,-1]
-gs.start(indexes)
+indices =[1,-1,-1]
+#manager = gs.Manager(indexes)
+#manager.start()
+
+peg = gs.Streamer(indices[0])
+
 
 while 1:
-    frame = gs.frame_peg
+    peg.stream()
+    frame = peg.frame
     cv2.imshow("peg", frame)
     cv2.waitKey(1)

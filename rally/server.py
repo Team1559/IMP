@@ -5,8 +5,8 @@ import thread
 
 host = "10.15.59.6"
 
-#port = 5805 #some legal port#
-port = 26
+port = 22 #some legal port
+
 
 lock = thread.allocate_lock()
 
@@ -27,8 +27,7 @@ class Server(object):
 		if self.c == None:
 			return
 		try:
-			#self.c.send("h"+str(heading[0])+","+str(heading[1])+"r"+str(z)+"d"+str(dist)+"t"+str(tid))
-			self.c.send(str(z))
+			self.c.send("h",heading[0],",",heading[1],"z",z,"d",dist,"t",tid)
 		except socket.error:
 			pass
 
@@ -37,7 +36,7 @@ class Server(object):
 		if self.c == None:
 			return
 		try:
-			r = self.c.recv(1024) #1024
+			r = self.c.recv(1024)
 			print r
 			return r
 		except socket.error:
@@ -68,7 +67,6 @@ def run():
 		#r = s.receive()
 		with lock:
 			s.send(heading,z,dist,tid)
-			#s.receive()
 			#if(r == "s"):
 				#s.send(cx)
 		s.close()

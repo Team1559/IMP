@@ -1,3 +1,8 @@
+#update apt-get
+echo "updating"
+echo "............."
+sudo apt-get update
+
 #gst for python
 echo "installing gst for python"
 echo "............."
@@ -19,7 +24,17 @@ sudo apt-get install guvcview
 
 #maplotlib
 echo "installing matplotlib for python"
-sudo apt-get install matplotlib-python
+sudo apt-get install python-matplotlib
 
 #pip
 sudo apt-get install python-pip
+
+#ssh
+sudo apt-get install openssh-server
+sudo service ssh enable
+
+#cmake
+#sudo apt-get install cmake
+
+#qt4
+#sudo apt-get install qt4-dev-tools

@@ -5,7 +5,6 @@ from gi.repository import Gst
 import numpy as np
 import thread
 import cv2
-import pegFinder
 
 
 
@@ -13,17 +12,17 @@ class Streamer(object):
 
     def __init__(self, index):
 
-        Gst.init(None)
+	Gst.init(None)
 
         #rear peg cam, stereo ones
         #sinks are sink+index, ex) sink0
-        path = "nvcamerasrc sensor-id="+str(index)+" ! video/x-raw(memory:NVMM), width=(int)800, height=(int)448, format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=2  ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink name=sink"+str(index)
+	path = "nvcamerasrc sensor-id="+str(index)+" ! video/x-raw(memory:NVMM), width=(int)800, height=(int)448, format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=2  ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink name=sink"
         self.pipe = Gst.parse_launch(path)
 
         #self.i = 0
         #for pipe in self.pipes:
         self.pipe.set_state(Gst.State.PLAYING)
-        self.appsink = self.pipe.get_by_name("sink"+str(index))
+        self.appsink = self.pipe.get_by_name("sink")
         self.appsink.set_property("emit-signals", True)
             #self.i = self.i + 1
 
@@ -33,25 +32,18 @@ class Streamer(object):
 
 	#print index
 
-	#self.peg = pegFinder.PegFinder()
-
 
     def stream(self):
 
-	#self.pipe.set_state(Gst.State.PLAYING)
-	#print self.appsink.get_property("emit-signals")
+        sample = self.appsink.emit("pull-sample")
 
-        sample = self.appsink.emit("pull-sample") ##problem##
+    	buf = sample.get_buffer()
+    	caps = sample.get_caps()
 
-	#print sample
-
-        buf = sample.get_buffer()
-        caps = sample.get_caps()
-
-        self.frame = np.ndarray((caps.get_structure(0).get_value('height'),caps.get_structure(0).get_value('width'),3),buffer=buf.extract_dup(0, buf.get_size()),dtype=np.uint8)
+    	self.frame = np.ndarray((caps.get_structure(0).get_value('height'),caps.get_structure(0).get_value('width'),3),buffer=buf.extract_dup(0, buf.get_size()),dtype=np.uint8)
         #self.frame = arr
 
-	#self.peg.find(self.frame)	
+	#print "update"
 
 
 class Manager(object):
@@ -59,14 +51,14 @@ class Manager(object):
     def __init__(self, indexes): #list of indexes of peg, right, left
 
         self.frame_peg = np.zeros((800,448,3), np.uint8) #black image
-        self.frame_right = np.zeros((800,448,3), np.uint8)
+	self.frame_right = np.zeros((800,448,3), np.uint8)
         self.frame_left = np.zeros((800,448,3), np.uint8)
 
         self.lock = thread.allocate_lock()
 
         self.camidlist = ["peg", "r", "l"]
 
-        self.indexes = indexes
+	self.indexes = indexes
 
 
 
@@ -88,9 +80,9 @@ class Manager(object):
             s = Streamer(index)
 	    #print "peg"
             while 1:
-                with self.lock:
+		with self.lock:
 		    #print "peg"
-                    s.stream()
+	            s.stream()
                     self.frame_peg = s.frame
 	            #cv2.imshow("",frame_peg)
        	            #cv2.waitKey(1)
@@ -99,14 +91,14 @@ class Manager(object):
             s = Streamer(index)
             while 1:
                 with self.lock:
-                    s.stream()
+		    s.stream()
                     self.frame_right = s.frame
 
         elif camid == "l":
             s = Streamer(index)
             while 1:
                 with self.lock:
-                    s.stream()
+		    s.stream()
                     self.frame_left = s.frame
 
 

@@ -1,0 +1,49 @@
+Hello my dudes
+
+
+To use the vision code at rally you just need to do a few things
+
+I would first suggest starting a VNC server on the Jetson
+-make sure that the IP of the Jetson is static, set to the IP 10.15.59.6, is on the same subnet of the roboRIO, and has the radio set as the default gateway
+-hit the *windows* key (or click the ubuntu logo) and type "desktop sharing"
+-launch the application that appears
+-check the boxes "Allow other users to view your desktop" and "Allow other users to control your desktop"
+-setting a password is optional but may be useful so no other teams accidentally access it
+-run the command "sudo apt-get install dconf-editor"
+-run the command "dconf-editor" after it is installed
+-navigate to org --> gnome --> desktop --> remote-access and uncheck the "require-encryption" option
+-you should now be able to access the desktop using a VNC client (I would suggest tightVNC) over the IP 10.15.59.6 with the standard port 
+
+
+The networking is (mostly) done!
+
+
+Next copy the directory "rally" that this is in and paste it on the desktop
+There should now be a folder on the desktop called "rally" that contains 5 python scripts, a shell script, and this text file
+
+
+Next you need to make a few small tweeks to the code
+1-in the file "/home/ubuntu/Desktop/rally/server.py" edit the "port" variable to be some legal port that is unblocked by the FMS at competition
+2-now you need to find the HSV filter values for the red LED
+ -you can change the HSV values by editing "/home/ubuntu/Desktop/rally/pegFinder.py" and changing the "self.hsvh" and "self.hsvl" arrays in the "__init__"" method of the pegFinder class
+ -"self.hsvh" is the high values and "self.hsvl" is the low values
+ -unfortunately there is no easy tool to test the values yet (hooray for (educated?) guess and check), so running "python peg.py" and viewing the "thresh" window is the besy way to find the values
+
+Once you have a legal port and working HSV values, running the command "python peg.py" will start the script
+
+
+Too bad you can't start the script at the beginning of the match, so we have to fix that too
+Since Ubuntu 16 changed all the init scripts around, let's do it the graphical way
+-hit the *windows* key to start dash again
+-search for "Startup Applications"
+-run the program
+-select "add"
+-name it and set the command to the script "/home/ubuntu/Desktop/rally/peg.py"
+-it should now run at boot
+
+
+That should be all
+
+
+Thanks my dudes,
+will

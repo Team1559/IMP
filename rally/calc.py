@@ -2,41 +2,23 @@ from __future__ import division
 import math
 
 
-fov = 60
-maxwidth = 1920
-
-
 def getAngle(error):
 
 	err = error
 	angle = 0.0
 
-	angle = math.atan(err / 1306.5)
+	angle = math.atan(err / 1115)
 	angle = math.degrees(angle)
 	angle = round(angle,2)
 
 	return angle
-
-
-def getPegAngle(error): #camera flipped on side
-
-	err = error
-	angle = 0.0
-
-	angle = math.atan(err/736.5)
-	angle = math.degrees(angle)
-	angle = round(angle,2)
-
-	return angle
-
-
 
 
 def getDist(errR, errL, len):
 
     if errL - errR == 0:
 	return -1000
-    return (len*maxwidth)/(2*math.tan(math.radians(fov/2))*(abs(errL-errR)))
+    return (len*1280)/(2*math.tan(math.radians(60/2))*(abs(errL-errR)))
 
 
 def getCenterAngle(angR, angL, dist): #on ot pic

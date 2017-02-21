@@ -37,7 +37,7 @@ class Stereo(object):
         _,frameR = self.caps[1].read()
 
         self.cx[0] = self.cx[1] = self.cy[0] = self.cy[1] = -1
-        self.distance = self.diagonalDist = self.centerAngle self.distancer = -1000
+        self.distance = self.diagonalDist = self.centerAngle = self.distancer = -1000
         self.angles[0] = self.angles[1] = -1000
         self.err[0] = self.err[1] = -600
 
@@ -66,7 +66,7 @@ class Stereo(object):
 
 	    if cv2.contourArea(cnt) < self.minarea:
 	        self.cx[0] = -1
-            self.cy[0] = -1
+            	self.cy[0] = -1
     		self.found = False
     		break;
 
@@ -105,7 +105,7 @@ class Stereo(object):
             self.angles[0] = calc.getAngle(self.err[0])
             self.angles[1] = calc.getAngle(self.err[1])
             self.distance = calc.getDist(self.err[0], self.err[1], self.length)
-            self.distancer = fidge.addFudge(self.distance)
+            #self.distancer = fudge.addFudge(self.distance)
             self.centerAngle = calc.getCenterAngle(self.angles[0], self.angles[1], self.distancer)
             self.diagonalDist = calc.getDiagonalDistance(self.centerAngle, self.distancer)
 
