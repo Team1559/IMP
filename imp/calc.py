@@ -2,7 +2,7 @@ from __future__ import division
 import math
 
 
-fov = 60
+fov = 53.5 #horizontal
 maxwidth = 1920
 
 
@@ -11,7 +11,7 @@ def getAngle(error):
 	err = error
 	angle = 0.0
 
-	angle = math.atan(err / 1306.5)
+	angle = math.atan(err / 1904.61)
 	angle = math.degrees(angle)
 	angle = round(angle,2)
 
@@ -23,7 +23,7 @@ def getPegAngle(error): #camera flipped on side
 	err = error
 	angle = 0.0
 
-	angle = math.atan(err/736.5)
+	angle = math.atan(err/1425.31)
 	angle = math.degrees(angle)
 	angle = round(angle,2)
 

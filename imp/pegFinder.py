@@ -9,14 +9,14 @@ from gi.repository import Gst
 
 class PegFinder(object):
 
-    def __init__(self, index): #frame passed in from gstreamer (replaced camid and VideoCapture)
+    def __init__(self, index, showImage): #camera index (for gstreamer)
 
         self.hsvl = np.array((30,0,0))
-        self.hsvh = np.array((80,255,255))
+        self.hsvh = np.array((75,255,255))
 	#self.hsvl = np.array((0,0,150)) #low hsv values for RED
 	#self.hsvh = np.array((15,255,255)) #high hsv values for RED
 
-        self.minarea = 10
+        self.minarea = 100
         self.found = True
 
         #self.cap = cv2.VideoCapture(camid)
@@ -28,17 +28,21 @@ class PegFinder(object):
 
         self.angle = -1000
 
-	#changed becuase camera on side
-        self.height = 800
+	self.found = True
+
+	#changed because camera on side
+        self.height = 1080
         self.width = 448
 
-	self.frame = np.zeros((800,448,3), np.uint8)
+	#self.frame = np.zeros((800,448,3), np.uint8)
+
+	self.showImage = showImage
 
 
 	Gst.init(None)
 
 	#camera mounted on side
-        path = "nvcamerasrc sensor-id="+str(index)+" ! queue max-size-buffers=0 max-size-bytes=0 max-size-time=0 ! video/x-raw(memory:NVMM), width=(int)448, height=(int)800, format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=1  ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! videobalance brightness=-.6  !appsink name=sink"+str(index)
+        path = "nvcamerasrc sensor-id="+str(index)+" ! queue max-size-buffers=0 max-size-bytes=0 max-size-time=0 ! video/x-raw(memory:NVMM), width=(int)448, height=(int)1080, format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=1  ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! videobalance brightness=-.6  !appsink name=sink"+str(index)
         self.pipe = Gst.parse_launch(path)
 
         self.pipe.set_state(Gst.State.PLAYING)
@@ -69,11 +73,19 @@ class PegFinder(object):
 
        	self.cx = self.cy = -1
         self.err = -600 #-1000 when 400 subtracted
+	self.angle = -1000
 
         #convert to hsv
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         thresh = cv2.inRange(hsv, self.hsvl, self.hsvh)
         threshcp = thresh.copy()
+
+	#blur it
+	thresh = cv2.blur(thresh, (5,5))
+
+	#erode and dilate
+	thresh = cv2.erode(thresh, (3,3))
+	thresh = cv2.dilate(thresh, (3,3))
 
         #find some contours
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
@@ -84,6 +96,8 @@ class PegFinder(object):
         #find centroids of contours
         i = 0
         for cnt in contours:
+
+		print cv2.contourArea(cnt)
 
         	if cv2.contourArea(cnt) < self.minarea:
         		self.cx = self.cy = -1
@@ -103,7 +117,8 @@ class PegFinder(object):
 	self.cx = (self.cx+1)/2
   	self.cy = (self.cy+1)/2
 
-        self.err = self.cx-(self.height/2)
+        self.err = self.cx-(self.height/2) #height bc camera flipped on side
+
 
         if self.found:
             self.angle = calc.getPegAngle(self.err)
@@ -115,9 +130,10 @@ class PegFinder(object):
         self.found = True
 
         #show the image
-        #cv2.imshow("thresh", threshcp)
-        #cv2.imshow("frame", frame)
-        #cv2.waitKey(1)
+	if self.showImage:
+        	cv2.imshow("thresh", threshcp)
+        	cv2.imshow("frame", frame)
+        	cv2.waitKey(1)
 
 
 

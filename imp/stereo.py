@@ -2,12 +2,12 @@
 import cv2
 import numpy as np
 import thread
-import fudge
+#import fudge
 
 
 class Stereo(object):
 
-    def __init__(self): #frames passed in from gstreamer (replaced camid and VideoCapture)
+    def __init__(self, indexr, indexl): #right index, left index 
 
         self.hsvl = np.array((20,30,200))
         self.hsvh = np.array((90,255,255))
@@ -30,11 +30,46 @@ class Stereo(object):
 
         self.found = True
 
+	self.minarea = 100
+
+	pathr = "nvcamerasrc sensor-id="+str(indexr)+" ! queue max-size-buffers=0 max-size-bytes=0 max-size-time=0 ! video/x-raw(memory:NVMM), width=(int)448, height=(int)1080, format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=1  ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! videobalance brightness=-.6  !appsink name=sink"+str(indexr)
+        self.piper = Gst.parse_launch(pathr)
+
+        self.piper.set_state(Gst.State.PLAYING)
+        self.appsinkr = self.pipe.get_by_name("sink"+str(indexr))
+        self.appsinkr.set_property("emit-signals", True)
+	self.appsinkr.set_property("max-buffers", 1)
+	self.appsinkr.set_property("drop", True)
+
+	pathl = "nvcamerasrc sensor-id="+str(indexl)+" ! queue max-size-buffers=0 max-size-bytes=0 max-size-time=0 ! video/x-raw(memory:NVMM), width=(int)448, height=(int)1080, format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=1  ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! videobalance brightness=-.6  !appsink name=sink"+str(indexl)
+        self.pipe = Gst.parse_launch(pathl)
+
+        self.pipel.set_state(Gst.State.PLAYING)
+        self.appsinkl = self.pipe.get_by_name("sink"+str(indexl))
+        self.appsinkl.set_property("emit-signals", True)
+	self.appsinkl.set_property("max-buffers", 1)
+	self.appsinkl.set_property("drop", True)
+
 
     def find(self, frameL, frameR): #frames passed in from gstreamer
 
-        _,frameL = self.caps[0].read()
-        _,frameR = self.caps[1].read()
+        #_,frameL = self.caps[0].read()
+        #_,frameR = self.caps[1].read()
+
+
+	sampler = self.appsinkr.emit("pull-sample") ##problem##
+        bufr = sampler.get_buffer()
+        capsr = sampler.get_caps()
+
+        frameR = np.ndarray((capsr.get_structure(0).get_value('height'),capsr.get_structure(0).get_value('width'),3),buffer=bufr.extract_dup(0, bufr.get_size()),dtype=np.uint8)
+
+
+	samplel = self.appsinkl.emit("pull-sample") ##problem##
+        bufl = samplel.get_buffer()
+        capsl = samplel.get_caps()
+
+        frameL = np.ndarray((capsl.get_structure(0).get_value('height'),capsl.get_structure(0).get_value('width'),3),buffer=bufl.extract_dup(0, bufl.get_size()),dtype=np.uint8)
+
 
         self.cx[0] = self.cx[1] = self.cy[0] = self.cy[1] = -1
         self.distance = self.diagonalDist = self.centerAngle = self.distancer = -1000

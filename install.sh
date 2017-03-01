@@ -38,3 +38,6 @@ sudo service ssh enable
 
 #qt4
 #sudo apt-get install qt4-dev-tools
+
+#for vnc
+sudo apt-get install dconf-editor
