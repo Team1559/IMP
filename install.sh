@@ -41,3 +41,7 @@ sudo service ssh enable
 
 #for vnc
 sudo apt-get install dconf-editor
+
+sudo apt-get install tightvncserver
+
+sudo chmod +x /home/ubuntu/Desktop/imp/pegTest.py

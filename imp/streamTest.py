@@ -2,7 +2,7 @@ import gst_streamer as gs
 import cv2
 #import time
 
-indices =[1,-1,-1]
+indices =[0,-1,-1]
 #manager = gs.Manager(indexes)
 #manager.start()
 

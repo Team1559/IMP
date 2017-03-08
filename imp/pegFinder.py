@@ -97,7 +97,7 @@ class PegFinder(object):
         i = 0
         for cnt in contours:
 
-		print cv2.contourArea(cnt)
+		#print cv2.contourArea(cnt)
 
         	if cv2.contourArea(cnt) < self.minarea:
         		self.cx = self.cy = -1

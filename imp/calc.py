@@ -39,11 +39,14 @@ def getDist(errR, errL, len):
     return (len*maxwidth)/(2*math.tan(math.radians(fov/2))*(abs(errL-errR)))
 
 
-def getCenterAngle(angR, angL, dist): #on ot pic
+def getCenterAngle(angR, angL, dist, length): #on ot pic
+
+    #print "L: "+str(abs(angL))
+    #print "R: "+str(abs(angR))
 
     if abs(angL) > abs(angR): #on the right
         theta = round(dist/((length/2)-(dist/math.tan(math.radians(90-angL)))),3)
-    elif abs(angR) < abs(angL): #on the left
+    elif abs(angR) > abs(angL): #on the left
         theta = -1*round(dist/((length/2)-(dist/math.tan(math.radians(90-angR)))),3)
     elif angR == angL:
     	theta = 0 #dead on

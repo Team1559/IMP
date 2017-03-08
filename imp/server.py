@@ -4,7 +4,7 @@ import sys
 import thread
 
 #host = "10.15.59.6"
-host = "10.15.59.75"
+host = "10.15.59.6"
 
 #port = 5805 #some legal port#
 port = 26

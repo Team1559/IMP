@@ -17,11 +17,14 @@ for arg in sys.argv:
 
 
 
+#server.startServer() #bad?
+p = pegFinder.PegFinder(0, showImage)
 server.startServer()
-p = pegFinder.PegFinder(1, showImage)
+
 
 while 1:
 	p.find()
 	server.putData((-1000,-1000),p.angle,-1000,1)
+	#server.putData((1,1),1,1,1)
 	print "angle:"+str(p.angle)
 	#print p.err

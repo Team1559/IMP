@@ -17,7 +17,7 @@ class Streamer(object):
 
         #rear peg cam, stereo ones
         #sinks are sink+index, ex) sink0
-        path = "nvcamerasrc sensor-id="+str(index)+" ! queue max-size-buffers=0 max-size-bytes=0 max-size-time=0 ! video/x-raw(memory:NVMM), width=(int)800, height=(int)1080, format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=1  ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink name=sink"+str(index)
+        path = "nvcamerasrc sensor-id="+str(index)+" ! queue max-size-buffers=0 max-size-bytes=0 max-size-time=0 ! video/x-raw(memory:NVMM), width=(int)640, height=(int)480, format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=1  ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink name=sink"+str(index)
         self.pipe = Gst.parse_launch(path)
 
         #self.i = 0
